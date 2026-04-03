@@ -5,7 +5,7 @@ import backendAssignment.zorvyn.dto.RecordRequestDTO;
 import backendAssignment.zorvyn.dto.RecordResponseDTO;
 import backendAssignment.zorvyn.entity.RecordType;
 import backendAssignment.zorvyn.service.RecordService;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +32,7 @@ public class RecordController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Create a financial record", description = "Creates a new financial record(Admin only)")
     public ResponseEntity<RecordResponseDTO>createRecord(@Valid @RequestBody RecordRequestDTO recordRequestDTO, Authentication authentication){
         RecordResponseDTO response = recordService.createRecord(recordRequestDTO, authentication.getName());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -40,6 +41,7 @@ public class RecordController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ANALYST', 'ADMIN')")
+    @Operation(summary = "Get all records", description = "Returns paginated and filterable financial records(Analyst, Admin)")
     public ResponseEntity<Page<RecordResponseDTO>>getRecords(@RequestParam(required = false)RecordType type,
                                                              @RequestParam(required = false)String category,
                                                              @RequestParam(required = false) LocalDate startDate,
@@ -59,12 +61,14 @@ public class RecordController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ANALYST', 'ADMIN')")
+    @Operation(summary = "Get record by ID", description = "Returns a single financial record(Analyst, Admin)")
     public ResponseEntity<RecordResponseDTO>getRecordById(@PathVariable Long id){
         return ResponseEntity.ok(recordService.getRecordById(id));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Update a financial record", description = "Updates an existing financial record(Admin only)")
     public ResponseEntity<RecordResponseDTO>updateRecord(@PathVariable Long id, @Valid @RequestBody RecordRequestDTO recordRequestDTO){
         return ResponseEntity.ok(recordService.updateRecord(id, recordRequestDTO));
     }
@@ -72,6 +76,7 @@ public class RecordController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Delete a financial record", description = "Soft-deletes a financial record(Admin only)")
     public String deleteRecord(@PathVariable Long id){
         return recordService.deleteRecord(id);
     }
