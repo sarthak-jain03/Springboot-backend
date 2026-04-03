@@ -24,7 +24,7 @@ import java.time.LocalDateTime;
         @Index(name = "idx_deleted", columnList = "deleted")
 })
 @EntityListeners(AuditingEntityListener.class)
-public class Record {
+public class FinancialRecord {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
