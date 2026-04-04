@@ -65,7 +65,7 @@ public class DashboardService {
                     .build()
             );
 
-            if (RecordType.INCOME.name().equals(type)){
+            if (RecordType.INCOME.equals(type)){
                 summary.setTotalIncome(summary.getTotalIncome() + (amount != null ? amount : 0.0));
             }
             else{

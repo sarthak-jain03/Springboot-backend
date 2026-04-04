@@ -4,21 +4,21 @@ import backendAssignment.zorvyn.dto.LoginRequestDTO;
 import backendAssignment.zorvyn.dto.LoginResponseDTO;
 import backendAssignment.zorvyn.dto.SignupRequestDTO;
 import backendAssignment.zorvyn.dto.SignupResponseDTO;
-import backendAssignment.zorvyn.entity.Role;
+
 import backendAssignment.zorvyn.entity.User;
+import backendAssignment.zorvyn.error.UserAlreadyExistsException;
+import backendAssignment.zorvyn.error.UserInactiveException;
 import backendAssignment.zorvyn.repository.UserRepository;
 import backendAssignment.zorvyn.security.UserPrincipal;
 import backendAssignment.zorvyn.utils.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -33,11 +33,11 @@ public class AuthService {
     public SignupResponseDTO signup(SignupRequestDTO signupRequestDTO){
 
         if (userRepository.existsByUsername(signupRequestDTO.getUsername())){
-            throw new IllegalArgumentException("Username already exists!");
+            throw new UserAlreadyExistsException("Username already exists!");
         }
 
         if (userRepository.existsByEmail(signupRequestDTO.getEmail())){
-            throw new IllegalArgumentException("Email already exists!");
+            throw new UserAlreadyExistsException("Email already exists!");
         }
 
         User user = User.builder()
@@ -60,7 +60,7 @@ public class AuthService {
     }
 
     public LoginResponseDTO login(LoginRequestDTO loginRequestDTO){
-        try {
+
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             loginRequestDTO.getUsername(),
@@ -71,7 +71,7 @@ public class AuthService {
             UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
 
             if (!principal.getUser().isActive()) {
-                throw new RuntimeException("User account is inactive");
+                throw new UserInactiveException("User account is inactive");
             }
 
             String token = authUtil.generateAccessToken(principal);
@@ -84,10 +84,5 @@ public class AuthService {
                     principal.getId(),
                     principal.getUser().getRoles()
             );
-
-        } catch (BadCredentialsException e) {
-            log.warn("Failed login attempt for username: {}", loginRequestDTO.getUsername());
-            throw new RuntimeException("Invalid username or password");
-        }
     }
 }

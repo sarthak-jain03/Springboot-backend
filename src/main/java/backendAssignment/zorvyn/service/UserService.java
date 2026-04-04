@@ -10,8 +10,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Pageable;
+
 
 @Service
 @Slf4j
@@ -38,12 +40,12 @@ public class UserService {
 
 
     public UserResponseDTO getUserById(Long id){
-        User user = userRepository.findById(id).orElseThrow(()-> new RuntimeException("User not found!"));
+        User user = userRepository.findById(id).orElseThrow(()-> new UsernameNotFoundException("User not found with id:" + id));
         return maptoUserResponse(user);
     }
 
     public UserResponseDTO updateRoles(Long id, UpdatedRolesRequest updatedRolesRequest){
-        User user = userRepository.findById(id).orElseThrow(()->new RuntimeException("User not found!"));
+        User user = userRepository.findById(id).orElseThrow(()->new UsernameNotFoundException("User not found with id:" + id));
         user.setRoles(updatedRolesRequest.getRoles());
         User updatedUser = userRepository.save(user);
         log.info("roles updated successfully");
@@ -51,17 +53,16 @@ public class UserService {
     }
 
     public UserResponseDTO updateStatus(Long id, UpdatedStatusRequestDTO updatedStatusRequestDTO){
-        User user = userRepository.findById(id).orElseThrow(()->new RuntimeException("User not found!"));
+        User user = userRepository.findById(id).orElseThrow(()->new UsernameNotFoundException("User not found with id:" + id));
         user.setActive(updatedStatusRequestDTO.isActive());
         User updatedUser = userRepository.save(user);
         log.info("status updated successfully.");
         return maptoUserResponse(updatedUser);
     }
 
-    public String deleteUserById(Long id){
-        User user = userRepository.findById(id).orElseThrow(()-> new IllegalArgumentException("User not found!"));
+    public void deleteUserById(Long id){
+        User user = userRepository.findById(id).orElseThrow(()-> new UsernameNotFoundException("User not found with id:"+ id));
         userRepository.delete(user);
-        return "User with id: "+ id + " is deleted successfully.";
     }
 
 }

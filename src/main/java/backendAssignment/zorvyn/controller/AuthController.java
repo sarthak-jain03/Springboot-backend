@@ -15,7 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 @Tag(name="Authentication", description = "user signup and login")
 public class AuthController {
@@ -31,7 +31,7 @@ public class AuthController {
 
     @PostMapping("/login")
     @Operation(summary = "Login", description = "Login to existing account.")
-    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO loginRequestDTO){
+    public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO){
         return ResponseEntity.ok(authService.login(loginRequestDTO));
     }
 

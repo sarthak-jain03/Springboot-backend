@@ -77,8 +77,9 @@ public class RecordController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Delete a financial record", description = "Soft-deletes a financial record(Admin only)")
-    public String deleteRecord(@PathVariable Long id){
-        return recordService.deleteRecord(id);
+    public ResponseEntity<Void>deleteRecord(@PathVariable Long id){
+        recordService.deleteRecord(id);
+        return ResponseEntity.noContent().build();
     }
 
 

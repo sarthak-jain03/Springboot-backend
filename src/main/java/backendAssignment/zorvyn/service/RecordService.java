@@ -6,12 +6,14 @@ import backendAssignment.zorvyn.dto.RecordResponseDTO;
 import backendAssignment.zorvyn.entity.FinancialRecord;
 import backendAssignment.zorvyn.entity.RecordType;
 import backendAssignment.zorvyn.entity.User;
+import backendAssignment.zorvyn.error.RecordNotFoundException;
 import backendAssignment.zorvyn.repository.RecordRepository;
 import backendAssignment.zorvyn.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 
@@ -23,7 +25,7 @@ public class RecordService {
     private final UserRepository userRepository;
 
     public RecordResponseDTO createRecord(RecordRequestDTO recordRequestDTO, String username){
-        User user = userRepository.findByUsername(username).orElseThrow(()->new IllegalArgumentException("User not found!"));
+        User user = userRepository.findByUsername(username).orElseThrow(()->new UsernameNotFoundException("User not found"));
 
         FinancialRecord record = FinancialRecord.builder()
                 .amount(recordRequestDTO.getAmount())
@@ -57,7 +59,7 @@ public class RecordService {
 
 
     public RecordResponseDTO getRecordById(Long id){
-        FinancialRecord record = recordRepository.findById(id).orElseThrow(()->new IllegalArgumentException("Record not found!"));
+        FinancialRecord record = recordRepository.findById(id).orElseThrow(()->new RecordNotFoundException("Record not found with id: "+id));
         return mapToRecordResponse(record);
     }
 
@@ -98,7 +100,7 @@ public class RecordService {
     }
 
     public RecordResponseDTO updateRecord(Long id, RecordRequestDTO recordRequestDTO){
-        FinancialRecord record = recordRepository.findByIdAndDeletedFalse(id).orElseThrow(()->new IllegalArgumentException("Record not found!"));
+        FinancialRecord record = recordRepository.findByIdAndDeletedFalse(id).orElseThrow(()->new RecordNotFoundException("Record not found with id: "+id));
 
         record.setAmount(recordRequestDTO.getAmount());
         record.setType(recordRequestDTO.getType());
@@ -111,10 +113,9 @@ public class RecordService {
         return mapToRecordResponse(updatedRecord);
     }
 
-    public String deleteRecord(Long id){
-        FinancialRecord record = recordRepository.findByIdAndDeletedFalse(id).orElseThrow(()->new IllegalArgumentException("Record not found!"));
+    public void deleteRecord(Long id){
+        FinancialRecord record = recordRepository.findByIdAndDeletedFalse(id).orElseThrow(()->new RecordNotFoundException("Record not found with id: "+id));
         record.setDeleted(true);
         recordRepository.save(record);
-        return "Record soft deleted successfully.";
     }
 }

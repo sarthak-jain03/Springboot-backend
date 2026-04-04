@@ -7,7 +7,7 @@ import backendAssignment.zorvyn.dto.UserResponseDTO;
 import backendAssignment.zorvyn.repository.UserRepository;
 import backendAssignment.zorvyn.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
+
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -29,7 +29,7 @@ public class UserController {
     private final UserService userService;
 
 
-    @GetMapping("/getAllUsers")
+    @GetMapping
     @Operation(summary = "Get All Users", description = "It will fetch all the users in the form of pagination.")
     public ResponseEntity<Page<UserResponseDTO>>getAllUsers(@RequestParam(defaultValue = "0")int page,
                                                            @RequestParam(defaultValue = "10")int size,
@@ -40,28 +40,29 @@ public class UserController {
         return ResponseEntity.ok(userService.getAllUsers(pageable));
     }
 
-    @GetMapping("getUserById/{id}")
+    @GetMapping("/{id}")
     @Operation(summary = "Get user by Id", description = "It will fetch the user with the given id.")
     public ResponseEntity<UserResponseDTO>getUserById(@PathVariable Long id){
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
-    @PostMapping("/updateRoles/{id}")
+    @PatchMapping("/{id}/roles")
     @Operation(summary = "Update Roles", description = "It will update the roles of the user.")
     public ResponseEntity<UserResponseDTO>updateRoles(@PathVariable Long id, @RequestBody UpdatedRolesRequest updatedRolesRequest){
         return ResponseEntity.ok(userService.updateRoles(id, updatedRolesRequest));
     }
 
-    @PostMapping("/updateStatus/{id}")
+    @PatchMapping("/{id}/status")
     @Operation(summary = "Update Status", description = "It will update the status of the user.")
     public ResponseEntity<UserResponseDTO>updateStatus(@PathVariable Long id, @RequestBody UpdatedStatusRequestDTO updatedStatusRequestDTO){
         return ResponseEntity.ok(userService.updateStatus(id, updatedStatusRequestDTO));
     }
 
-    @DeleteMapping("/deleteUserById/{id}")
+    @DeleteMapping("/{id}")
     @Operation(summary = "Delete user by Id", description = "It will delete the user with the given id.")
-    public ResponseEntity<String>deleteUserById(@PathVariable Long id){
-        return ResponseEntity.ok(userService.deleteUserById(id));
+    public ResponseEntity<Void>deleteUserById(@PathVariable Long id){
+        userService.deleteUserById(id);
+        return ResponseEntity.noContent().build();
     }
 
 

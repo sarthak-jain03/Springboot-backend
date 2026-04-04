@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdatedStatusRequestDTO {
-    @NotNull
+
     private boolean active;
 }
