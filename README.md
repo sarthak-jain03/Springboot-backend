@@ -5,6 +5,8 @@ role-based access control, JWT authentication, rate limiting, and
 analytics dashboards.
 
 ------------------------------------------------------------------------
+### API Documentation Link: https://springboot-backend-oizc.onrender.com/swagger-ui/index.html
+------------------------------------------------------------------------
 
 ## Features
 
